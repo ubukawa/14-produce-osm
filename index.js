@@ -210,18 +210,9 @@ SELECT column_name FROM information_schema.columns
 //      cols.push(`ST_AsGeoJSON(${table}.geom)`)
       cols.push(`ST_AsGeoJSON(ST_Transform(${table}.geom, 4326))`)
       await client.query(`BEGIN`)
-////for EPSG3857 only
-//    let minpt = new Array(bbox[0], bbox[1])
-//    let tminpt = turf.point(minpt)
-//    let mminpt = projection.toMercator(tminpt)
-//    let maxpt = new Array(bbox[2], bbox[3])
-//    let tmaxpt = turf.point(maxpt)
-//    let mmaxpt = projection.toMercator(tmaxpt)
-//    let mbbox = new Array(mminpt.geometry.coordinates[0],mminpt.geometry.coordinates[1],mmaxpt.geometry.coordinates[0],mmaxpt.geometry.coordinates[1],3857)
       sql = `
 DECLARE cur CURSOR FOR 
 WITH 
-//  envelope AS (SELECT ST_MakeEnvelope(${mbbox.join(', ')}) AS geom)
   envelope AS (SELECT ST_Transform(ST_MakeEnvelope(${bbox.join(', ')}, 4326), 3857) AS geom)
 SELECT 
   ${cols.toString()}
